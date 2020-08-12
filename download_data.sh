@@ -9,7 +9,7 @@ printf "\n"
 read download
 if [ "$download" == "ok" ]; then
     cd ./simulations/traj_processed
-    wget [s3bucket]
+    wget https://lipids-comparison.s3.eu-west-2.amazonaws.com/traj_processed.tar.gz
     tar -xzvf traj_processed.tar.gz
     rm traj_processed.tar.gz
     cd -
