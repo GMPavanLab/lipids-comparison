@@ -10,8 +10,7 @@ read download
 if [ "$download" == "ok" ]; then
     cd ./simulations/traj_processed
     wget https://lipids-comparison.s3.eu-west-2.amazonaws.com/traj_processed.tar.gz
-    tar -xzvf traj_processed.tar.gz
-    rm traj_processed.tar.gz
+    tar -xzvf traj_processed.tar.gz && rm traj_processed.tar.gz
     cd -
 else
     exit 1
@@ -24,7 +23,10 @@ printf "\n"
 
 read download
 if [ "$download" == "yeah" ]; then
+    cd ./simulations/traj_raw
     wget [s3bucket]
+    tar -xzvf traj_raw.tar.gz && rm traj_raw.tar.gz
+    cd -
 else
     exit 1
 fi
