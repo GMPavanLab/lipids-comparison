@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3:4.7.12
 
-ENV CONDA_ENV_PREFIX /opt/conda/envs/gmplabtools
+ENV CONDA_ENV_PREFIX /opt/conda/envs/lipids
 ENV PATH ${CONDA_ENV_PREFIX}/bin:$PATH
 ENV LD_LIBRARY_PATH ${CONDA_ENV_PREFIX}/lib:$LD_LIBRARY_PATH
 
