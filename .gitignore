@@ -99,5 +99,5 @@ ENV/
 .pytest_cache/
 
 # data
-simulations/processed_trajectories
-simulations/raw_trajectories
+simulations/traj_processed
+simulations/traj_raw
