@@ -11,7 +11,7 @@ from shared import *
 def main(system, cutoff, average, overwrite=True):
 
     files = sorted(glob.glob('{}/Lipids/dscribe_{}{}/avg_soap/{}_ang/POPC_*npz'.format(HOME, system, TR, cutoff)))
-    print('Processing only 303k for now')
+    print('Processing trajectories at 303k')
     files = [i for i in files if '303' in i]
 
     dist = np.zeros((len(files), len(files)))

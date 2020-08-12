@@ -30,7 +30,7 @@ def main(system, cutoff, sample, overwrite=True):
 
     X = np.vstack(X)
 
-    pca = PCA(n_components=7)
+    pca = PCA(n_components=10)
     pca.fit(X)
 
     folder = "{}/Lipids/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
@@ -41,7 +41,7 @@ def main(system, cutoff, sample, overwrite=True):
     joblib.dump(pca, folder + 'pca.pkl')
 
     files = sorted(glob.glob("{}POPC_*npz".format(prefix)))
-    print('Processing only 303k for now')
+    print('Processing trajectories at 303k')
     files = [i for i in files if '303' in i]
 
     if overwrite:

@@ -11,6 +11,7 @@ HOME = os.path.expanduser("~")
 
 TR = "_1us"
 
+MAX_TRAJ_SIZE = 4000
 
 def grouper(iterable, n):
     if len(iterable) % 3 != 0:

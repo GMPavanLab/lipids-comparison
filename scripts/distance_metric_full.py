@@ -18,7 +18,7 @@ def main(system, cutoff, sample, overwrite=True):
     prefix = "{}/Lipids/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
     files = sorted(glob.glob("{}POPC_*npy".format(prefix)))
 
-    print('Processing only 303k for now')
+    print('Processing trajectories at 303k')
     files = [i for i in files if '303' in i]
 
     x = extract_sample(files, sample)

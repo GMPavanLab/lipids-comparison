@@ -20,7 +20,7 @@ def get_folder(average):
 def main(system, cutoff, average, overwrite=True):
 
     files = sorted(glob.glob('{}/Lipids/trajectories_{}{}/POPC_*xyz'.format(HOME, system, TR)))
-    print('Processing only 303k for now')
+    print('Processing trajectories at 303k')
     files = [i for i in files if '303' in i]
     folder = '{}/Lipids/dscribe_{}{}/{}/{}_ang/'.format(HOME, system, TR, get_folder(average), cutoff)
 
@@ -43,8 +43,11 @@ def main(system, cutoff, average, overwrite=True):
             )
 
             traj = read_traj(f)
+            SIZE = min(len(traj), MAX_TRAJ_SIZE)
 
-            box = np.loadtxt(f[:-4] + '.box')
+            box = np.loadtxt(f[:-4] + '.box')[-MAX_TRAJ_SIZE:,:]
+            traj = traj[-MAX_TRAJ_SIZE:]
+            
             for i, j in enumerate(traj):
                 traj[i].set_cell(list(box[i]))
                 traj[i].set_pbc([1, 1, 0])
@@ -73,7 +76,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", dest="cutoff", type=int,
                         help="config file")
 
-    parser.add_argument("-a", dest="average", type=str2bool, default=True,
+    parser.add_argument("-a", dest="average", type=str, default="off",
                         help="perform average")
 
     parser.add_argument("-ow", dest="overwrite", type=str2bool, default=False,
@@ -81,4 +84,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.system, args.cutoff, bool(args.average), bool(args.overwrite))
+    main(args.system, args.cutoff, args.average, bool(args.overwrite))
