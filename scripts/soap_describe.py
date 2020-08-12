@@ -14,7 +14,7 @@ species = {
 }
 
 def get_folder(average):
-    return "avg_soap" if average else "full_soap"
+    return "avg_soap" if average "inner" else "full_soap"
 
 
 def main(system, cutoff, average, overwrite=True):

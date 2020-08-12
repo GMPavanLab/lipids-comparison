@@ -2,10 +2,10 @@ name: lipids
 channels:
   - conda-forge
 dependencies:
-  - sklearn-optimize
   - ase=3.19.0
+  - cython
   - cycler=0.10.0
-  - dscribe=0.4.1 # 0.3.5 available for linux
+  - dscribe=0.4.0 # 0.3.5 available for linux
   - ipykernel
   - ipython
   - ipywidgets
@@ -26,9 +26,5 @@ dependencies:
   - python-dateutil=2.8.1
   - scikit-learn=0.22.2.post1
   - scipy=1.4.1
-  - seaborn=0.10.0
   - setuptools
-  - toml=0.10.0
   - wheel
-  - pip:
-      - fst-pso==1.7.10

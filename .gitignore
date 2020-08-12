@@ -98,5 +98,6 @@ ENV/
 # pytest
 .pytest_cache/
 
-# tmp folder
-tmp/
+# data
+simulations/traj_processed
+simulations/traj_raw
