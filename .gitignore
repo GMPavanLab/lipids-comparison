@@ -98,5 +98,6 @@ ENV/
 # pytest
 .pytest_cache/
 
-# tmp folder
-tmp/
+# data
+simulations/processed_trajectories
+simulations/raw_trajectories
