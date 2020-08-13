@@ -16,17 +16,17 @@
 ;	  gmx_mpi pdb2gmx -f test.pdb -p topol.top -o popc.gro
 ;	Force field was read from current directory or a relative path - path added.
 ;
-#include "./gromos43a1-s3.ff/forcefield.itp"
+#include "./toppar/forcefield.itp"
 
 
-#include "./gromos43a1-s3.ff/ffG43A1-S3.02.itp"
+#include "./toppar/ffG43A1-S3.02.itp"
 
 
 ; Include water topology
-#include "./gromos43a1-s3.ff/spc.itp"
+#include "./toppar/spc.itp"
 
 ; Include lipid topology
-#include "./gromos43a1-s3.ff/lipids_43A1-S3.itp"
+#include "./toppar/lipids_43A1-S3.itp"
 
 #ifdef POSRES_WATER
 ; Position restraint for each water oxygen
