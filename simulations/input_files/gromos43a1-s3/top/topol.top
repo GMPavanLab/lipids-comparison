@@ -1,0 +1,45 @@
+;
+;	File 'topol.top' was generated
+;	By user: cape (501)
+;	On host: cantoalto.homenet.telecomitalia.it
+;	At date: Sat Jul 18 16:35:30 2020
+;
+;	This is a standalone topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2018.8 (-:
+;	
+;	Executable:   /Users/cape/programs/gromacs-2018.8/bin/gmx_mpi
+;	Data prefix:  /Users/cape/programs/gromacs-2018.8
+;	Working dir:  /Volumes/Elements_2TB/membranes/simulations/UA/POPC_gromos53a6_kukol/gromacs_303K
+;	Command line:
+;	  gmx_mpi pdb2gmx -f test.pdb -p topol.top -o popc.gro
+;	Force field was read from current directory or a relative path - path added.
+;
+#include "./toppar/forcefield.itp"
+
+
+#include "./toppar/ffG43A1-S3.02.itp"
+
+
+; Include water topology
+#include "./toppar/spc.itp"
+
+; Include lipid topology
+#include "./toppar/lipids_43A1-S3.itp"
+
+#ifdef POSRES_WATER
+; Position restraint for each water oxygen
+[ position_restraints ]
+;  i funct       fcx        fcy        fcz
+   1    1       1000       1000       1000
+#endif
+
+[ system ]
+; Name
+POPC bilayer in water
+
+[ molecules ]
+; Compound        #mols
+POPC                128
+SOL             14600

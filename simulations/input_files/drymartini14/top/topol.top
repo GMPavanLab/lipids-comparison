@@ -1,0 +1,11 @@
+#include "toppar/dry_martini_v2.1.itp"
+#include "toppar/dry_martini_v2.1_lipids.itp"
+#include "toppar/dry_martini_v2.1_ions.itp"
+
+[ system ]
+; name
+Martini system
+
+[ molecules ]
+; name        number
+POPC 128
