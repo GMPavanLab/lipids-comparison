@@ -68,7 +68,7 @@ if __name__ == '__main__':
     parser.add_argument("-z", dest="sample", type=int,
                         help="sample size")
 
-    parser.add_argument("-ow", dest="overwrite", type=str2bool, default=True,
+    parser.add_argument("-ow", dest="overwrite", type=str2bool, default=False,
                         help="overwrite")
 
     args = parser.parse_args()

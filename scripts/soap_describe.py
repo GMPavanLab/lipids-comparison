@@ -14,7 +14,7 @@ species = {
 }
 
 def get_folder(average):
-    return "avg_soap" if average "inner" else "full_soap"
+    return "avg_soap" if average == "inner" else "full_soap"
 
 
 def main(system, cutoff, average, overwrite=True):
@@ -31,7 +31,7 @@ def main(system, cutoff, average, overwrite=True):
 	    
         save_name = folder + f[:-4].split('/')[-1]
         
-        if not os.path.isfile(save_name + '.npy') or overwrite: 
+        if not os.path.isfile(save_name + '.npz') or overwrite: 
 
             soap_input = dict(
                 average=average,

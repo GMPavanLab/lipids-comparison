@@ -149,7 +149,7 @@ def ref_prob(filename, grid, n, size, D_thr=15):
     return predict(dens, nn, grid), x
 
 
-def calculate_kl(p, files, fine_grid, n, size):
+def calculate_js(p, files, fine_grid, n, size):
     kls = []
     for file in files:
         x = np.load(file)

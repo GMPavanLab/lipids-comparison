@@ -10,6 +10,7 @@ from shared import *
 D_thr = 15  # Chisq parameter of PAk
 F = 3  # this boy is just a trick to make the grid tighter around pdf
 NEIGHBORS = 3  # number of neighbords to approximate density from PAk for oos
+PCA_DIMENSIONS = 5
 SIZE = 50000  # size of dataset for PAk
 
 
@@ -23,7 +24,7 @@ def main(system, cutoff, sample, overwrite=True):
 
     x = extract_sample(files, sample)
 
-    x = np.hstack([x[:, :3], x[:,-1:]])
+    x = np.hstack([x[:, :PCA_DIMENSIONS], x[:,-1:]])
 
     raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(25)
     fine_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(100)
@@ -42,8 +43,8 @@ def main(system, cutoff, sample, overwrite=True):
 
     dist = np.zeros((len(files), len(files)))
     for i, f in enumerate(files):
-        p, _ = ref_prob(f, fine_grid, 3, 50000)
-        kls = calculate_kl(p, files, fine_grid, 3, 50000)
+        p, _ = ref_prob(f, fine_grid, PCA_DIMENSIONS, 50000)
+        kls = calculate_js(p, files, fine_grid, PCA_DIMENSIONS, 50000)
         dist[i, :] = kls
 
     if overwrite:
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     parser.add_argument("-z", dest="sample", type=int,
                         help="sample size")
 
-    parser.add_argument("-ow", dest="overwrite", type=str2bool, default=True,
+    parser.add_argument("-ow", dest="overwrite", type=str2bool, default=False,
                         help="overwrite")
 
     args = parser.parse_args()
