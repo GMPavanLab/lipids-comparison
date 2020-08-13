@@ -1,0 +1,13 @@
+#include "toppar/martini_v3.0.b.3.2.itp"
+#include "toppar/martini_v3.0_phospholipids.itp"
+#include "toppar/martini_v3.0_ions.itp"
+#include "toppar/martini_v3.0_solvents.itp"
+
+[ system ]
+; name
+Martini system
+
+[ molecules ]
+; name        number
+POPC 128
+WN 3370
