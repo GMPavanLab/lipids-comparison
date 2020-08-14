@@ -1,4 +1,4 @@
-FROM softmaxltd/lipids-comparison-base:0.0.1
+FROM softmaxltd/lipids-comparison:base
 
 ADD scripts ./scripts
 ADD download_data.sh .
