@@ -26,18 +26,20 @@ def main(system, cutoff, sample, overwrite=True):
 
     x = np.hstack([x[:, :PCA_DIMENSIONS], x[:,-1:]])
 
-    raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(25)
-    fine_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(100)
-    print("Grid shapes: {}, {}".format(raw_grid.shape, fine_grid.shape))
+    raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(20)
+    fine_grid = UniformGrid('minmax').fit(x[:, :-1]).lazy_transform(50)
+    print("Raw grid shape: {}".format(raw_grid.shape))
     raw_grid = np.hstack([raw_grid, np.zeros((raw_grid.shape[0], 1)) + np.max(x[:,-1]) + 1])
-    knn = filter_grid(raw_grid, x)
+    knn = fit_grid_refiner(raw_grid, x)
 
-    v = knn.predict_proba(fine_grid)
-    v[:,-1] = v[:, -1] * F
-    v = np.argmax(v, axis=1)
+    # v = knn.predict_proba(fine_grid)
+    # v[:,-1] = v[:, -1] * F
+    # v = np.argmax(v, axis=1)
 
-    mask = v <= np.max(x[:, -1])
-    fine_grid = fine_grid[mask]
+    # mask = v <= np.max(x[:, -1])
+    # fine_grid = fine_grid[mask]
+
+    fine_grid = filter_grid(knn, fine_grid, 1000)
 
     print("Filtered grid: {}".format(fine_grid.shape))
 

@@ -1,4 +1,5 @@
 import os
+import itertools
 
 import numpy as np
 from ase.io import read
@@ -65,6 +66,22 @@ def cartesian_product(arrays):
     return arr.reshape(la, -1).T
 
 
+def _lazy_cartesian_product(ranges):
+    return itertools.product(*ranges)
+
+
+def lazy_cartesian_product(arrays, size=100):
+    x = []
+    for i,v in enumerate(_lazy_cartesian_product(arrays)):
+        if not (i + 1) % size:
+            x.append(v)
+            yield np.array(x)
+            x = []
+        else:
+            x.append(v)
+    yield np.array(x)
+
+
 class UniformGrid:
     
     def __init__(self, mode='minmax', percentile=5):
@@ -83,7 +100,6 @@ class UniformGrid:
             
         return l, u
         
-            
     def fit(self, x):
         self.dim = x.shape[1]
         for dim in range(self.dim):
@@ -102,14 +118,42 @@ class UniformGrid:
                 )
             )
         return cartesian_product(ranges)
+
+    def lazy_transform(self, n, chunk=100):
+        ranges = []
+        for dim in range(self.dim):
+            spacing = ( self.minmax[dim][1] - self.minmax[dim][0] ) / n
+            ranges.append(
+                list(
+                    np.linspace(
+                        self.minmax[dim][0] - spacing / 2, 
+                        self.minmax[dim][1] + spacing / 2, 
+                        n
+                )
+                )
+            )
+        return lazy_cartesian_product(ranges, chunk)
     
 
-def filter_grid(grid, sample_points, neigh=10):
+def fit_grid_refiner(grid, sample_points, neigh=10):
     knn = KNeighborsClassifier(neigh)
     x = np.vstack([grid, sample_points])
     x, y = x[:,:-1], x[:, -1:]
     knn.fit(x, y.reshape((x.shape[0],)).astype(int))
     return knn
+
+
+def filter_grid(knn, fine_grid_iter, f):
+    filtered = []
+    for it in fine_grid_iter:
+        if it.shape[0]: 
+            v = knn.predict_proba(it)
+            v[:,-1] = v[:, -1] * f
+            v = np.argmax(v, axis=1)
+
+            mask = v <= it.shape[1] 
+            filtered.append(it[mask])
+    return np.vstack(filtered)
 
 
 def extract_sample(files, sample_size=5000):
