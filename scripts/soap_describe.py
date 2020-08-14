@@ -5,24 +5,27 @@ import argparse
 import numpy as np
 from dscribe.descriptors import SOAP
 
-from shared import *
+from tools import *
 
-
-species = {
-    "4beads": ["N", "P", "C"],
-    "phosphate": ["P"]
-}
 
 def get_folder(average):
-    return "avg_soap" if average "inner" else "full_soap"
+    return "avg_soap" if average == "inner" else "full_soap"
 
 
 def main(system, cutoff, average, overwrite=True):
 
-    files = sorted(glob.glob('{}/Lipids/trajectories_{}{}/POPC_*xyz'.format(HOME, system, TR)))
-    print('Processing trajectories at 303k')
+    files = sorted(
+        glob.glob(
+            "{}/Lipids/trajectories_{}{}/POPC_*xyz"
+            .format(HOME, system, TR)
+        )
+    )
+    print("Processing trajectories at 303k")
     files = [i for i in files if '303' in i]
-    folder = '{}/Lipids/dscribe_{}{}/{}/{}_ang/'.format(HOME, system, TR, get_folder(average), cutoff)
+    folder = (
+        "{}/Lipids/dscribe_{}{}/{}/{}_ang/"
+        .format(HOME, system, TR, get_folder(average), cutoff)
+    )
 
     if not os.path.isdir(folder):
         os.mkdir(folder)
@@ -31,7 +34,7 @@ def main(system, cutoff, average, overwrite=True):
 	    
         save_name = folder + f[:-4].split('/')[-1]
         
-        if not os.path.isfile(save_name + '.npy') or overwrite: 
+        if not os.path.isfile(save_name + '.npz') or overwrite: 
 
             soap_input = dict(
                 average=average,

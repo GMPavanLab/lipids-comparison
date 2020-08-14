@@ -3,14 +3,18 @@ import time
 import argparse
 
 import numpy as np
-from dscribe.descriptors import SOAP
 
 from shared import *
 
 
 def main(system, cutoff, average, overwrite=True):
 
-    files = sorted(glob.glob('{}/Lipids/dscribe_{}{}/avg_soap/{}_ang/POPC_*npz'.format(HOME, system, TR, cutoff)))
+    files = sorted(
+        glob.glob(
+            '{}/Lipids/dscribe_{}{}/avg_soap/{}_ang/POPC_*npz'
+            .format(HOME, system, TR, cutoff)
+        )
+    )
     print('Processing trajectories at 303k')
     files = [i for i in files if '303' in i]
 
