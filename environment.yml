@@ -28,3 +28,5 @@ dependencies:
   - scipy=1.4.1
   - setuptools
   - wheel
+  - pip:
+      - easycython
