@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: softmaxltd/lipids-comparison-base:base
+      - image: softmaxltd/lipids-comparison:base
     steps:
       - checkout
       - run:
