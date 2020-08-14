@@ -35,18 +35,10 @@ def read_traj(filename, index=":", start=None, end=None, stride=None):
     return read(filename, index=index, format="xyz")
 
 
-def KernelSoap(x, y, n):
-    return ( np.dot(x, y) / (np.dot(x, x) * np.dot(y, y)) ** 0.5 ) ** n
-
-
-def DistanceSoap(x, y, n=1):
-    try:
-        return (2.0 - 2.0 * KernelSoap(x, y, n)) ** 0.5
-    except FloatingPointError:
-        return 0
-
-
 def str2bool(v):
+    """
+    Convert string to boolean for argument parsing. 
+    """
     if isinstance(v, bool):
        return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -57,7 +49,27 @@ def str2bool(v):
         raise ValueError('Boolean value expected.')
 
 
+def KernelSoap(x, y, n):
+    """
+    Soap Kernel
+    """
+    return ( np.dot(x, y) / (np.dot(x, x) * np.dot(y, y)) ** 0.5 ) ** n
+
+
+def DistanceSoap(x, y, n=1):
+    """
+    Distance based on Soap Kernel.
+    """
+    try:
+        return (2.0 - 2.0 * KernelSoap(x, y, n)) ** 0.5
+    except FloatingPointError:
+        return 0
+
+
 def cartesian_product(arrays):
+    """
+    Explicit grid genereation.
+    """
     la = len(arrays)
     dtype = np.result_type(*arrays)
     arr = np.empty([la] + [len(a) for a in arrays], dtype=dtype)
@@ -67,10 +79,16 @@ def cartesian_product(arrays):
 
 
 def _lazy_cartesian_product(ranges):
+    """
+    Generate grid using iteratools.product.
+    """
     return itertools.product(*ranges)
 
 
 def lazy_cartesian_product(arrays, size=100):
+    """
+    Group generator in array of size `size`.
+    """
     x = []
     for i,v in enumerate(_lazy_cartesian_product(arrays)):
         if not (i + 1) % size:
@@ -83,7 +101,10 @@ def lazy_cartesian_product(arrays, size=100):
 
 
 class UniformGrid:
-    
+    """
+    This class is used to generate an uniform grid based on the range of values
+    contained in a reference dataset.
+    """
     def __init__(self, mode='minmax', percentile=5):
         self.mode = mode
         self.percentile = percentile
@@ -101,6 +122,9 @@ class UniformGrid:
         return l, u
         
     def fit(self, x):
+        """
+        Determination of ranges of value for grid creation.
+        """
         self.dim = x.shape[1]
         for dim in range(self.dim):
             self.minmax[dim] = self.get_ranges(x[:, dim])
@@ -120,6 +144,9 @@ class UniformGrid:
         return cartesian_product(ranges)
 
     def lazy_transform(self, n, chunk=100):
+        """
+        Create grid as a generator in chunk is size `chunk` for lazy evaluation.
+        """
         ranges = []
         for dim in range(self.dim):
             spacing = ( self.minmax[dim][1] - self.minmax[dim][0] ) / n
@@ -136,6 +163,10 @@ class UniformGrid:
     
 
 def fit_grid_refiner(grid, sample_points, neigh=10):
+    """
+    Fit a KNeighborsClassifier to filter out gridpoints which
+    are not likely to be meaninful.
+    """
     knn = KNeighborsClassifier(neigh)
     x = np.vstack([grid, sample_points])
     x, y = x[:,:-1], x[:, -1:]
@@ -144,6 +175,10 @@ def fit_grid_refiner(grid, sample_points, neigh=10):
 
 
 def filter_grid(knn, fine_grid_iter, f):
+    """
+    Filter grid created by grid generator using classifier and
+    output the result.
+    """
     filtered = []
     for it in fine_grid_iter:
         if it.shape[0]: 
@@ -157,6 +192,9 @@ def filter_grid(knn, fine_grid_iter, f):
 
 
 def extract_sample(files, sample_size=5000):
+    """
+    Extract a sample of size `sample_size` from each dataset in files.
+    """
     X = []
     for i, file in enumerate(files):
         x = np.load(file)
@@ -168,15 +206,24 @@ def extract_sample(files, sample_size=5000):
 
 
 def KL(p, q):
+    """
+    Kullback-Leibler divergence
+    """
     return np.sum(p * np.log(p / q))
 
 
 def JS(p, q):
+    """
+    Jensen–Shannon divergence
+    """
     m = (p + q) / 2
     return (entropy(p, m)[0] + entropy(q, m)[0]) / 2
 
 
 def predict(d, k, x):
+    """
+    Use NearestNeighbors to interpolate densities on out of sample values.
+    """
     densities = np.exp(np.array(d.densities_))
     values = []
     for row in x:
@@ -187,6 +234,9 @@ def predict(d, k, x):
 
 
 def ref_prob(filename, grid, n, size, D_thr=15):
+    """
+    Calculculate reference probabilities.
+    """
     x = np.load(filename)[:size, :n]
     nn = NearestNeighbors(n_neighbors=3).fit(x)
     dens = DensityPeakAdvanced(D_thr=D_thr, k_max=500).fit(x)
@@ -194,6 +244,10 @@ def ref_prob(filename, grid, n, size, D_thr=15):
 
 
 def calculate_js(p, files, fine_grid, n, size):
+    """
+    Jensen–Shannon divergence for reference densities p with all dataset in
+    files on grid.
+    """
     kls = []
     for file in files:
         x = np.load(file)
