@@ -7,6 +7,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: List
+          command: ls
+      - run:
           name: Run Tests
           command: |
             pytest lipids-comparison/scripts/tools/tests/

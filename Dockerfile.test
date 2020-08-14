@@ -1,0 +1,6 @@
+FROM softmaxltd/lipids-comparison-base:0.0.1
+
+ADD scripts ./scripts
+ADD download_data.sh .
+
+ENTRYPOINT ["pytest", "scripts/tools/test"]
