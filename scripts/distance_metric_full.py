@@ -4,14 +4,7 @@ import argparse
 
 import numpy as np
 
-from shared import *
-
-
-D_thr = 15  # Chisq parameter of PAk
-F = 3  # this boy is just a trick to make the grid tighter around pdf
-NEIGHBORS = 3  # number of neighbords to approximate density from PAk for oos
-PCA_DIMENSIONS = 5
-SIZE = 50000  # size of dataset for PAk
+from tools import *
 
 
 def main(system, cutoff, sample, overwrite=True):
@@ -29,7 +22,9 @@ def main(system, cutoff, sample, overwrite=True):
     raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(20)
     fine_grid = UniformGrid('minmax').fit(x[:, :-1]).lazy_transform(50)
     print("Raw grid shape: {}".format(raw_grid.shape))
-    raw_grid = np.hstack([raw_grid, np.zeros((raw_grid.shape[0], 1)) + np.max(x[:,-1]) + 1])
+    raw_grid = np.hstack(
+        [raw_grid, np.zeros((raw_grid.shape[0], 1)) + np.max(x[:,-1]) + 1]
+    )
     knn = fit_grid_refiner(raw_grid, x)
 
     # v = knn.predict_proba(fine_grid)
@@ -50,7 +45,10 @@ def main(system, cutoff, sample, overwrite=True):
         dist[i, :] = kls
 
     if overwrite:
-        filename = "{}/Lipids/dscribe_{}{}/distance_full_{}_ang".format(HOME, system, TR, cutoff)
+        filename = (
+            "{}/Lipids/dscribe_{}{}/distance_full_{}_ang"
+            .format(HOME, system, TR, cutoff)
+        )
         np.save(filename, dist)
 
 
