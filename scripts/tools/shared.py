@@ -1,5 +1,5 @@
 import numpy as np
-# from Pipeline.DPA import DensityPeakAdvanced
+from Pipeline.DPA import DensityPeakAdvanced
 from sklearn.neighbors import NearestNeighbors, KNeighborsClassifier
 
 from .utils import cartesian_product, lazy_cartesian_product

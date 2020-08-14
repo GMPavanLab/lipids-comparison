@@ -20,10 +20,10 @@ RUN conda env create --file /environment.yml \
 RUN echo "source activate lipids" > ~/.bashrc \
     && mkdir /home/lipids 
 
+WORKDIR /home/lipids
+
 RUN git clone https://github.com/mariaderrico/DPA.git \
     && cd DPA \
     && python setup.py develop
-
-WORKDIR /home/lipids
 
 CMD [ "/bin/bash" ]
