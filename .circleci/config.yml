@@ -6,8 +6,6 @@ jobs:
       - image: softmaxltd/lipids-comparison-base:0.0.1
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - run:
           name: Run Tests
           command: |
