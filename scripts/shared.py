@@ -15,12 +15,18 @@ TR = "_1us"
 MAX_TRAJ_SIZE = 4000
 
 def grouper(iterable, n):
-    if len(iterable) % 3 != 0:
+    """
+    Group iterable exaclty by n.
+    """
+    if len(iterable) % n != 0:
         raise ValueError(f"Iterable's length is not a multiple of {n}")
     return zip(*(iter(iterable),) * n)
 
 
 def frame2string(coord):
+    """
+    Convert a xyz frame to string.
+    """
     write = ""
     for i, frame in enumerate(coord):
         write += "%d\nAutoGen_%d\n" % (len(coord[0]), i)
@@ -30,6 +36,9 @@ def frame2string(coord):
 
 
 def read_traj(filename, index=":", start=None, end=None, stride=None):
+    """
+    Read xyz trajectory into a ase.Atoms object.
+    """
     if all([start, end, stride]):
         index = "{}:{}:{}".format(start, end, stride),
     return read(filename, index=index, format="xyz")
