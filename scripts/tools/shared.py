@@ -148,7 +148,6 @@ def calculate_js(p, files, fine_grid, n, size):
         nn = NearestNeighbors(n_neighbors=3).fit(x)
         dens = DensityPeakAdvanced(k_max=500).fit(x)
         q = predict(dens, nn, fine_grid)
-        kl = JS(p, q)
+        kl = JS(p, q)[0]
         kls.append(kl)
-        print(file, kl)
     return kls
