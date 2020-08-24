@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import entropy
+from scipy.spatial.distance import jensenshannon
 
 
 def KernelSoap(x, y, n):
@@ -30,5 +30,4 @@ def JS(p, q):
     """
     Jensen–Shannon divergence
     """
-    m = (p + q) / 2
-    return (entropy(p, m)[0] + entropy(q, m)[0]) / 2
+    return jensenshannon(np.exp(p), np.exp(q))[0]
