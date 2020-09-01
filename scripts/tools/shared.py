@@ -20,7 +20,7 @@ class UniformGrid:
     def get_ranges(self, x):
         if self.mode == 'minmax':
             l, u = x.min(), x.max()
-        elif self.mode == 'precentile':
+        elif self.mode == 'percentile':
             l, u = np.percentile(x, self.percentile), np.percentile(x, 100 - self.percentile)
         else:
             raise ValueError('Mode not available')
@@ -109,6 +109,26 @@ def extract_sample(files, sample_size=5000):
         x = np.hstack([x, np.zeros([x.shape[0], 1]) + i])
         X.append(x)
     return np.vstack(X)
+
+
+def average_predict(x, grid, D, size, D_thr, folds):
+    """
+    Average the probability density estimates on the fine grid by reapeating the 
+    fitting on subsample of the original dataset.
+    """
+    preds = []
+    for i in range(folds):
+        np.random.shuffle(x)
+        X = x[:size, :D]
+        print('Average predict: size {}, fold {}'.format(X.shape[0], i))
+        nn = NearestNeighbors(n_neighbors=3).fit(X)
+        print('\tFitted nearest neighbors')
+        dens = DensityPeakAdvanced(D_thr=D_thr, k_max=500).fit(X)
+        print('\tFitted density peak')
+        tmp = predict(dens, nn, grid).reshape(-1, 1)
+        print('\tPredicted')
+        preds.append(tmp)
+    return np.hstack(preds).mean(0)
 
 
 def predict(d, k, x):
