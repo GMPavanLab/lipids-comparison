@@ -19,8 +19,8 @@ def main(system, cutoff, sample, overwrite=True):
 
     x = np.hstack([x[:, :PCA_DIMENSIONS], x[:,-1:]])
 
-    raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(20)
-    fine_grid = UniformGrid('minmax').fit(x[:, :-1]).lazy_transform(50)
+    raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(10)
+    fine_grid = UniformGrid('minmax').fit(x[:, :-1]).lazy_transform(50, chunk=10000)
     print("Raw grid shape: {}".format(raw_grid.shape))
     raw_grid = np.hstack(
         [raw_grid, np.zeros((raw_grid.shape[0], 1)) + np.max(x[:,-1]) + 1]
@@ -41,8 +41,8 @@ def main(system, cutoff, sample, overwrite=True):
     dist = np.zeros((len(files), len(files)))
     for i, f in enumerate(files):
         p, _ = ref_prob(f, fine_grid, PCA_DIMENSIONS, 50000)
-        kls = calculate_js(p, files, fine_grid, PCA_DIMENSIONS, 50000)
-        dist[i, :] = kls
+        kls = calculate_js(p, files[(i + 1):], fine_grid, PCA_DIMENSIONS, 50000)
+        dist[i, (i + 1):] = kls
 
     if overwrite:
         filename = (
