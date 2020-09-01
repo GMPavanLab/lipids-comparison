@@ -12,5 +12,5 @@ def test_JS():
     result =  JS(p, q)
 
     # then:
-    assert isinstance(result, int)
+    assert isinstance(result, float)
     assert result >= 0
