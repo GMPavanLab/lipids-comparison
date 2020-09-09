@@ -30,4 +30,4 @@ def JS(p, q):
     """
     Jensen–Shannon divergence
     """
-    return jensenshannon(np.exp(p), np.exp(q))[0]
+    return jensenshannon(np.exp(p), np.exp(q))

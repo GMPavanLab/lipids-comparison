@@ -12,43 +12,31 @@ def main(system, cutoff, sample, overwrite=True):
     prefix = "{}/Lipids/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
     files = sorted(glob.glob("{}POPC_*npy".format(prefix)))
 
-    print('Processing trajectories at 303k')
     files = [i for i in files if '303' in i]
+    print('Processing {} trajectories at 303k'.format(len(files)))
 
-    x = extract_sample(files, sample)
-
-    x = np.hstack([x[:, :PCA_DIMENSIONS], x[:,-1:]])
-
-    raw_grid = UniformGrid('minmax').fit(x[:, :-1]).transform(10)
-    fine_grid = UniformGrid('minmax').fit(x[:, :-1]).lazy_transform(50, chunk=10000)
-    print("Raw grid shape: {}".format(raw_grid.shape))
-    raw_grid = np.hstack(
-        [raw_grid, np.zeros((raw_grid.shape[0], 1)) + np.max(x[:,-1]) + 1]
-    )
-    knn = fit_grid_refiner(raw_grid, x)
-
-    # v = knn.predict_proba(fine_grid)
-    # v[:,-1] = v[:, -1] * F
-    # v = np.argmax(v, axis=1)
-
-    # mask = v <= np.max(x[:, -1])
-    # fine_grid = fine_grid[mask]
-
-    fine_grid = filter_grid(knn, fine_grid, 1000)
+    grid_filename = "{}/Lipids/dscribe_{}{}/grid_{}_ang.npy".format(HOME, system, TR, cutoff)
+    fine_grid = np.load(grid_filename)
 
     print("Filtered grid: {}".format(fine_grid.shape))
 
+    ref_probs = []
+    for i, f in enumerate(files):
+        x = np.load(f)
+        tmp = average_predict(x, fine_grid, PCA_DIMENSIONS, sample, D_thr, 10)
+        f_suffix = f.split('/')[-1][:-4]
+        p_filaname = "{}/Lipids/dscribe_{}{}/probs/probs_{}_ang_{}.npy".format(HOME, system, TR, cutoff, f_suffix)
+        np.save(p_filaname, tmp)
+        ref_probs.append(tmp)
+
     dist = np.zeros((len(files), len(files)))
     for i, f in enumerate(files):
-        p, _ = ref_prob(f, fine_grid, PCA_DIMENSIONS, 50000)
-        kls = calculate_js(p, files[(i + 1):], fine_grid, PCA_DIMENSIONS, 50000)
-        dist[i, (i + 1):] = kls
+        for j, f in enumerate(files):
+            if i >= j:
+                dist[i, j] = JS(ref_probs[i], ref_probs[j])
 
     if overwrite:
-        filename = (
-            "{}/Lipids/dscribe_{}{}/distance_full_{}_ang"
-            .format(HOME, system, TR, cutoff)
-        )
+        filename = "{}/Lipids/dscribe_{}{}/distance_full_{}_ang".format(HOME, system, TR, cutoff)
         np.save(filename, dist)
 
 
