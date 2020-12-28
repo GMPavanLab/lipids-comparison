@@ -11,22 +11,26 @@ class UniformGrid:
     This class is used to generate an uniform grid based on the range of values
     contained in a reference dataset.
     """
-    def __init__(self, mode='minmax', percentile=5):
+
+    def __init__(self, mode="minmax", percentile=5):
         self.mode = mode
         self.percentile = percentile
         self.dim = None
         self.minmax = {}
-        
+
     def get_ranges(self, x):
-        if self.mode == 'minmax':
+        if self.mode == "minmax":
             l, u = x.min(), x.max()
-        elif self.mode == 'percentile':
-            l, u = np.percentile(x, self.percentile), np.percentile(x, 100 - self.percentile)
+        elif self.mode == "percentile":
+            l, u = (
+                np.percentile(x, self.percentile),
+                np.percentile(x, 100 - self.percentile),
+            )
         else:
-            raise ValueError('Mode not available')
-            
+            raise ValueError("Mode not available")
+
         return l, u
-        
+
     def fit(self, x):
         """
         Determination of ranges of value for grid creation.
@@ -35,20 +39,20 @@ class UniformGrid:
         for dim in range(self.dim):
             self.minmax[dim] = self.get_ranges(x[:, dim])
         return self
-    
+
     def _transform(self, n):
         """
         Returns list of ranges for grid creation.
         """
         ranges = []
         for dim in range(self.dim):
-            spacing = ( self.minmax[dim][1] - self.minmax[dim][0] ) / n
+            spacing = (self.minmax[dim][1] - self.minmax[dim][0]) / n
             ranges.append(
                 list(
                     np.linspace(
-                        self.minmax[dim][0] - spacing / 2, 
-                        self.minmax[dim][1] + spacing / 2, 
-                        n
+                        self.minmax[dim][0] - spacing / 2,
+                        self.minmax[dim][1] + spacing / 2,
+                        n,
                     )
                 )
             )
@@ -60,13 +64,12 @@ class UniformGrid:
         """
         return cartesian_product(self._transform(n))
 
-
     def lazy_transform(self, n, chunk=100):
         """
         Create grid as a generator in chunk is size `chunk` for lazy evaluation.
         """
         return lazy_cartesian_product(self._transform(n), chunk)
-    
+
 
 def fit_grid_refiner(grid, sample_points, neigh=10):
     """
@@ -75,7 +78,7 @@ def fit_grid_refiner(grid, sample_points, neigh=10):
     """
     knn = KNeighborsClassifier(neigh)
     x = np.vstack([grid, sample_points])
-    x, y = x[:,:-1], x[:, -1:]
+    x, y = x[:, :-1], x[:, -1:]
     knn.fit(x, y.reshape((x.shape[0],)).astype(int))
     return knn
 
@@ -87,12 +90,12 @@ def filter_grid(knn, fine_grid_iter, f):
     """
     filtered = []
     for it in fine_grid_iter:
-        if it.shape[0]: 
+        if it.shape[0]:
             v = knn.predict_proba(it)
-            v[:,-1] = v[:, -1] * f
+            v[:, -1] = v[:, -1] * f
             v = np.argmax(v, axis=1)
 
-            mask = v <= it.shape[1] 
+            mask = v <= it.shape[1]
             filtered.append(it[mask])
     return np.vstack(filtered)
 
@@ -105,7 +108,7 @@ def extract_sample(files, sample_size=5000):
     for i, file in enumerate(files):
         x = np.load(file)
         np.random.shuffle(x)
-        x = x[:sample_size,:]
+        x = x[:sample_size, :]
         x = np.hstack([x, np.zeros([x.shape[0], 1]) + i])
         X.append(x)
     return np.vstack(X)
@@ -116,42 +119,52 @@ def average_predict(x, grid, D, size, D_thr, folds):
     Average the probability density estimates on the fine grid by reapeating the 
     fitting on subsample of the original dataset.
     """
+    threshold = np.sum(np.diag(np.cov(x.T))) ** 0.5
+    print("Threshold value: {}".format(threshold))
+
     preds = []
     for i in range(folds):
         np.random.shuffle(x)
         X = x[:size, :D]
-        print('Average predict: size {}, fold {}'.format(X.shape[0], i))
+        print("Average predict: size {}, fold {}".format(X.shape[0], i))
         nn = NearestNeighbors(n_neighbors=3).fit(X)
-        print('\tFitted nearest neighbors')
+        print("\tFitted nearest neighbors")
         dens = DensityPeakAdvanced(D_thr=D_thr, k_max=500).fit(X)
-        print('\tFitted density peak')
-        tmp = predict(dens, nn, grid).reshape(-1, 1)
-        print('\tPredicted')
+        print("\tFitted density peak")
+        tmp = predict(dens, nn, grid, threshold).reshape(-1, 1)
+        print("\tPredicted")
         preds.append(tmp)
-    return np.hstack(preds).mean(0)
+    out = np.hstack(preds)
+    return out
 
 
-def predict(d, k, x):
+def predict(d, k, x, th=10):
     """
     Use NearestNeighbors to interpolate densities on out of sample values.
     """
-    densities = np.exp(np.array(d.densities_))
+    densities = np.array(d.densities_)
     values = []
     for row in x:
         dist, indices = k.kneighbors(row.reshape(1, -1))
-        v = np.dot(1 / dist, densities[indices][0]) / np.sum(1 / dist)
-        values.append(v)
-    return np.log(values)
+        if dist.min() < th:
+            v = np.dot(1 / dist, densities[indices][0]) / np.sum(1 / dist)
+            values.append(v[0])
+        else:
+            values.append(-1e10)
+    values = np.array(values)
+    return np.exp(values)
 
 
-def ref_prob(filename, grid, n, size, D_thr=15):
+def ref_prob(filename, grid, D, size, D_thr=15, folds=10):
     """
     Calculculate reference probabilities.
     """
-    x = np.load(filename)[:size, :n]
+    x = np.load(filename)
+    np.random.shuffle(x)
+    x = x[:size, :D]
     nn = NearestNeighbors(n_neighbors=3).fit(x)
     dens = DensityPeakAdvanced(D_thr=D_thr, k_max=500).fit(x)
-    return predict(dens, nn, grid), x
+    return average_predict(x, grid, D, size, D_thr, folds)
 
 
 def calculate_js(p, files, fine_grid, n, size):
@@ -164,7 +177,6 @@ def calculate_js(p, files, fine_grid, n, size):
         x = np.load(file)
         np.random.shuffle(x)
         x = x[:size, :n]
-        print(x.shape)
         nn = NearestNeighbors(n_neighbors=3).fit(x)
         dens = DensityPeakAdvanced(k_max=500).fit(x)
         q = predict(dens, nn, fine_grid)
