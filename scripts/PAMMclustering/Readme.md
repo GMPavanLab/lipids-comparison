@@ -2,7 +2,7 @@
 
 **DISCLAIMER**
 We do not have developed the original PAMM algorithm.
-The original PAMM algorithm can be accessed online at [https://github.com/cosmo-epfl/pamm](PAMM) which is the implementation discussed in the original reference [https://pubs.acs.org/doi/10.1021/acs.jctc.7b00993](PAMMreference) (also avaliable there as SI files).
+The original PAMM algorithm can be accessed online at [PAMM](https://github.com/cosmo-epfl/pamm) which is the implementation discussed in the original reference [PAMMreference](https://pubs.acs.org/doi/10.1021/acs.jctc.7b00993) (also avaliable there as SI files).
 
 The notebook `pamm_clustering_general.ipynb` contains a general application of the PAMM clustering algorithm to a set of lipids membranes of different temperatures.
 
