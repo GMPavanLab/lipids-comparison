@@ -9,13 +9,13 @@ from tools import *
 
 def main(system, cutoff, sample, overwrite=True):
 
-    prefix = "{}/Lipids/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
+    prefix = "{}/data/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
     files = sorted(glob.glob("{}POPC_*npy".format(prefix)))
 
     files = [i for i in files if "303" in i]
     print("Processing {} trajectories at 303k".format(len(files)))
 
-    grid_filename = "{}/Lipids/dscribe_{}{}/grid_{}_ang.npy".format(
+    grid_filename = "{}/data/dscribe_{}{}/grid_{}_ang.npy".format(
         HOME, system, TR, cutoff
     )
     fine_grid = np.load(grid_filename)
@@ -27,7 +27,7 @@ def main(system, cutoff, sample, overwrite=True):
         x = np.load(f)
         tmp = average_predict(x, fine_grid, PCA_DIMENSIONS, sample, D_thr, 50)
         f_suffix = f.split("/")[-1][:-4]
-        p_filaname = "{}/Lipids/dscribe_{}{}/probs/probs_{}_ang_{}.npy".format(
+        p_filaname = "{}/data/dscribe_{}{}/probs/probs_{}_ang_{}.npy".format(
             HOME, system, TR, cutoff, f_suffix
         )
         np.save(p_filaname, tmp)
@@ -41,7 +41,7 @@ def main(system, cutoff, sample, overwrite=True):
                 dist[i, j] = JS(ref_probs[i], ref_probs[j])
 
     if overwrite:
-        filename = "{}/Lipids/dscribe_{}{}/distance_full_{}_ang".format(
+        filename = "{}/data/dscribe_{}{}/distance_full_{}_ang".format(
             HOME, system, TR, cutoff
         )
         np.save(filename, dist)

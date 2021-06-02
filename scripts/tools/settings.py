@@ -2,7 +2,7 @@ import os
 
 # Common settings
 
-HOME = os.path.expanduser("~")
+HOME = os.path.dirname(os.path.abspath("../README.md"))
 TR = "_1us"
 MAX_TRAJ_SIZE = 4000
 
@@ -16,7 +16,7 @@ species = {
 
 D_thr = 15  # Chisq parameter of PAk
 F = 3  # this boy is just a trick to make the grid tighter around pdf
-NEIGHBORS = 3  # number of neighbords to approximate density from PAk for oos estimations
+NEIGHBORS = 3  # number of neighbors to approximate density from PAk for oos estimations
 PCA_DIMENSIONS = 5
 SIZE = 50000  # size of dataset for PAk
 

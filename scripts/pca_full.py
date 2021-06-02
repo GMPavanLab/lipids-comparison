@@ -1,6 +1,7 @@
 import glob
 import time
 import argparse
+import pathlib
 
 import numpy as np
 from dscribe.descriptors import SOAP
@@ -13,7 +14,7 @@ from tools import *
 def main(system, cutoff, sample, overwrite=True):
 
     prefix = (
-        "{}/Lipids/dscribe_{}{}/full_soap/{}_ang/".format(HOME, system, TR, cutoff)
+        "{}/data/dscribe_{}{}/full_soap/{}_ang/".format(HOME, system, TR, cutoff)
     )
 
     X = []
@@ -31,11 +32,10 @@ def main(system, cutoff, sample, overwrite=True):
     pca.fit(X)
 
     folder = (
-        "{}/Lipids/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
+        "{}/data/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
     )
 
-    if not os.path.isdir(folder):
-        os.mkdir(folder)
+    pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
     joblib.dump(pca, folder + 'pca.pkl')
 
@@ -51,7 +51,6 @@ def main(system, cutoff, sample, overwrite=True):
             x = np.load(f)['arr_0']   
             out = pca.transform(x)
             np.save(save_name, out)
-
 
 
 if __name__ == '__main__':

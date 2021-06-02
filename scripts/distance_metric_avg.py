@@ -11,7 +11,7 @@ def main(system, cutoff, average, overwrite=True):
 
     files = sorted(
         glob.glob(
-            '{}/Lipids/dscribe_{}{}/avg_soap/{}_ang/POPC_*npz'
+            '{}/data/dscribe_{}{}/avg_soap/{}_ang/POPC_*npz'
             .format(HOME, system, TR, cutoff)
         )
     )
@@ -36,7 +36,7 @@ def main(system, cutoff, average, overwrite=True):
                 dist[i, j] = DistanceSoap(soap1, soap2)
 
     if overwrite:
-        filename = "{}/Lipids/dscribe_{}{}/distance_avg_{}_ang".format(HOME, system, TR, cutoff)
+        filename = "{}/data/dscribe_{}{}/distance_avg_{}_ang".format(HOME, system, TR, cutoff)
         np.save(filename, dist)
 
 if __name__ == '__main__':
