@@ -16,7 +16,7 @@ IZE = 50000  # size of dataset for PAk
 
 def main(system, cutoff, sample):
 
-    prefix = "{}/Lipids/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
+    prefix = "{}/data/dscribe_{}{}/pca/{}_ang/".format(HOME, system, TR, cutoff)
     files = sorted(glob.glob("{}POPC_*npy".format(prefix)))
 
     files = [i for i in files if '303' in i]
@@ -34,7 +34,7 @@ def main(system, cutoff, sample):
 
     fine_grid = filter_grid(knn, fine_grid, 0.02)
 
-    grid_filename = "{}/Lipids/dscribe_{}{}/grid_{}_ang".format(HOME, system, TR, cutoff)
+    grid_filename = "{}/data/dscribe_{}{}/grid_{}_ang".format(HOME, system, TR, cutoff)
     np.save(grid_filename, fine_grid)
 
     print("Filtered grid: {}".format(fine_grid.shape))

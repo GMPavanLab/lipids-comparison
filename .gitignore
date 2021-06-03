@@ -99,5 +99,4 @@ ENV/
 .pytest_cache/
 
 # data
-simulations/traj_processed/
-simulations/traj_raw/
+data/*

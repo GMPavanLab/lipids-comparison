@@ -16,25 +16,24 @@ def main(system, cutoff, average, overwrite=True):
 
     files = sorted(
         glob.glob(
-            "{}/Lipids/trajectories_{}{}/POPC_*xyz"
+            "{}/data/traj_{}{}/POPC_*xyz"
             .format(HOME, system, TR)
         )
     )
     print("Processing trajectories at 303k")
     files = [i for i in files if '303' in i]
     folder = (
-        "{}/Lipids/dscribe_{}{}/{}/{}_ang/"
+        "{}/data/dscribe_{}{}/{}/{}_ang/"
         .format(HOME, system, TR, get_folder(average), cutoff)
     )
 
-    if not os.path.isdir(folder):
-        os.mkdir(folder)
+    pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
     for f in files:
-	    
+
         save_name = folder + f[:-4].split('/')[-1]
-        
-        if not os.path.isfile(save_name + '.npz') or overwrite: 
+
+        if not os.path.isfile(save_name + '.npz') or overwrite:
 
             soap_input = dict(
                 average=average,
@@ -50,7 +49,7 @@ def main(system, cutoff, average, overwrite=True):
 
             box = np.loadtxt(f[:-4] + '.box')[-MAX_TRAJ_SIZE:,:]
             traj = traj[-MAX_TRAJ_SIZE:]
-            
+
             for i, j in enumerate(traj):
                 traj[i].set_cell(list(box[i]))
                 traj[i].set_pbc([1, 1, 0])
@@ -65,7 +64,7 @@ def main(system, cutoff, average, overwrite=True):
 
             np.savez_compressed(save_name, soap_vec)
             print('saved {}'.format(save_name), time.time() - tt)
-	    
+
         else:
 	        print('skip {}'.format(save_name))
 
